@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:usingfirestore_app/services/usermanagement.dart';
 import 'musiccategory.dart';
 
 class GroupsPage extends StatefulWidget {
+  
   @override
   _GroupsPageState createState() => _GroupsPageState();
 }
 
 class _GroupsPageState extends State<GroupsPage> {
+
+  UserManagement usermanagement = new UserManagement();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +28,9 @@ class _GroupsPageState extends State<GroupsPage> {
   
   }
   Widget _personList(){
+    
       return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance.collection('music').where("subcat",isEqualTo: "Graphic Designer").snapshots(),
+      stream: Firestore.instance.collection('music').where("subcat",isEqualTo:usermanagement.getcat() ).snapshots(),
       builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot){
         if(snapshot.hasError)
         {

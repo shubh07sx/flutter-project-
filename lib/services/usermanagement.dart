@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class UserManagement {
+    String temp;
+
     Future<void> storeNewUser(FirebaseUser user, BuildContext context) async {
       var result = await Firestore.instance.collection('users').add({
         'email': user.email,
@@ -78,7 +80,16 @@ Future updateProfilePic(picUrl) async {
   //    return Firestore.instance.collection('users').document('uid').snapshots();
   //  }
 
-
+   selectedcat(String cate) {
+     
+     temp = cate;
+     print(temp);
+  }
+  String getcat() {
+    print(temp);
+    return temp;
+  }
+ 
 
    String getphoto() { 
      String use;
