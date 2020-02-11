@@ -30,9 +30,10 @@ class _SelectProfilePageState extends State<SelectProfilePage> {
     );
     StorageUploadTask task = firebaseStorageRef.putFile(newProfilePic);
     StorageTaskSnapshot snapshottask = await task.onComplete;
-    String downloadUrl = await snapshottask.ref.getDownloadURL();
-    if(downloadUrl!=null){
-      userManagement.updateProfilePic(downloadUrl.toString()).then((val){
+    String profpicpath =  await snapshottask.ref.getDownloadURL();
+    print(profpicpath);
+    if(profpicpath!=null){
+      userManagement.updateProfilePic(profpicpath.toString()).then((val){
           Navigator.of(context).pushReplacementNamed('/homepage');
       }).catchError((e){
         print(e);

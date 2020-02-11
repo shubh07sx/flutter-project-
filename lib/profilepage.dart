@@ -19,7 +19,10 @@ class _ProfilePageState extends State<ProfilePage> {
       'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQL3964IjJHoLSLZ4iXOa9TPZcLzq7IKyFuzIXcaYlUwHg_61TV';
 
   var nickName = 'Tom';
-
+  var newBio;
+  var newCity;
+  var city = "USA";
+  var bio = "In 2016, she was named International Model of the Year by the British Fashion Council.";
   var proffesionName = 'Actor';
   bool isLoading = false;
   var proff;
@@ -30,13 +33,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String newNickName;
   String newProffesion;
-
+  Future userImageFuture;
   void initState() {
     super.initState();
     // setState(() {
     //    initUserData();
     // });
-   
+    userImageFuture = uploadImage();
     FirebaseAuth.instance.currentUser().then((user) async {
       //  var snap = await Firestore.instance.collection('users').document(user.uid).get();
       setState((){
@@ -82,14 +85,14 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Future uploadImage() async {
+  Future  uploadImage() async {
     var randomno = Random(25);
     final StorageReference firebaseStorageRef = FirebaseStorage.instance
         .ref()
         .child('profilepics/${randomno.nextInt(5000).toString()}.jpg');
     StorageUploadTask task = firebaseStorageRef.putFile(selectedImage);
     StorageTaskSnapshot snapshottask = await task.onComplete;
-    String downloadUrl = await snapshottask.ref.getDownloadURL();
+    String downloadUrl =  await snapshottask.ref.getDownloadURL();
     if (downloadUrl != null) {
       setState(() {
         userManagement.updateProfilePic(downloadUrl.toString()).then((val) {
@@ -101,16 +104,17 @@ class _ProfilePageState extends State<ProfilePage> {
           print(e);
         });
       });
-      // userManagement.updateProfilePic(downloadUrl.toString()).then((val){
-      //    setState(() {
-      //       profilePicUrl = val.downloadUrl.toString();
-      //       isLoading = false;
-      //     });
-      // }).catchError((e){
-      //   print(e);
-      // });
+    //   // userManagement.updateProfilePic(downloadUrl.toString()).then((val){
+    //   //    setState(() {
+    //   //       profilePicUrl = val.downloadUrl.toString();
+    //   //       isLoading = false;
+    //   //     });
+    //   // }).catchError((e){
+    //   //   print(e);
+    //   // });
     }
   }
+  
 
   Future<bool> editName(BuildContext context) async {
     return showDialog(
@@ -154,6 +158,73 @@ class _ProfilePageState extends State<ProfilePage> {
                   }).catchError((e) {
                     print(e);
                   });
+                },
+              )
+            ],
+          );
+        });
+  }
+  Future<bool> editBio(BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Edit  Bio', style: TextStyle(fontSize: 15.0)),
+            content: Container(
+              height: 200.0,
+              width: 200.0,
+              child: Column(
+                children: <Widget>[
+                  TextField(
+                    decoration: InputDecoration(
+                        labelText: 'New Bio',
+                        labelStyle: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.bold)),
+                    onChanged: (value) {
+                      newBio = value;
+                    },
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                        labelText: 'New City',
+                        labelStyle: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.bold)),
+                    onChanged: (value) {
+                      newCity = value;
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Update'),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                 
+                  FirebaseAuth.instance.currentUser().then((user){
+                    Firestore.instance.collection('city').document(user.uid).setData(
+                      {'user': user.displayName,'city': newCity}
+                    ).catchError((e){
+                      print(e);
+                    });
+                  });
+                  FirebaseAuth.instance.currentUser().then((user){
+                    Firestore.instance.collection("bio").document(user.uid).setData(
+                      {'user': user.displayName,'bio': newBio}
+                    ).catchError((e){
+                      print(e);
+                    }); 
+                  });
+                   setState(() {
+                    isLoading = true;
+                  });
+                 
+                  
                 },
               )
             ],
@@ -280,6 +351,34 @@ class _ProfilePageState extends State<ProfilePage> {
           )
         : Container();
   }
+  // Widget displayImage(){
+  //   return FutureBuilder(
+  //     future: uploadImage(),
+  //     builder: ( context, snapshot){
+  //       if(snapshot.connectionState==ConnectionState.done){
+  //         print("${snapshot.data}");
+  //          return  Container(
+                     
+  //                   width: 150.0,
+  //                   height: 150.0,
+  //                   decoration: BoxDecoration(
+          
+  //                       color: Colors.red,
+  //                       image: DecorationImage(
+  //                           image: NetworkImage(snapshot.data??'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQL3964IjJHoLSLZ4iXOa9TPZcLzq7IKyFuzIXcaYlUwHg_61TV'),
+  //                           fit: BoxFit.cover),
+  //                       borderRadius: BorderRadius.all(Radius.circular(75.0)),
+  //                       boxShadow: [
+  //                         BoxShadow(blurRadius: 7.0, color: Colors.black)
+  //                       ]));
+  //       }
+  //       else{
+  //         return CircularProgressIndicator();
+  //       }
+  //     }
+  //   );
+  
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +386,7 @@ class _ProfilePageState extends State<ProfilePage> {
       // backgroundColor:Colors.black87,
         body: new Stack(
         
-      children: <Widget>[
+        children: <Widget>[
         ClipPath(
           child: Container(color: Colors.black.withOpacity(0.8)),
           clipper: getClipper(),
@@ -298,6 +397,7 @@ class _ProfilePageState extends State<ProfilePage> {
             top: MediaQuery.of(context).size.height / 5,
             child: Column(
               children: <Widget>[
+              
                 Container(
                      
                     width: 150.0,
@@ -306,12 +406,14 @@ class _ProfilePageState extends State<ProfilePage> {
           
                         color: Colors.red,
                         image: DecorationImage(
-                            image: NetworkImage(profilePicUrl),
+                            image: NetworkImage(profilePicUrl??"https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQL3964IjJHoLSLZ4iXOa9TPZcLzq7IKyFuzIXcaYlUwHg_61TV"),
                             fit: BoxFit.cover),
                         borderRadius: BorderRadius.all(Radius.circular(75.0)),
                         boxShadow: [
                           BoxShadow(blurRadius: 7.0, color: Colors.black)
                         ])),
+                // SizedBox(height: 20.0,),
+                // displayImage(),
                 SizedBox(height: 20.0),
                 getLoader(),
                 SizedBox(height: 65.0),
@@ -484,7 +586,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         ))
                 ],),
                  SizedBox(height: 15.0),
-                 Container(
+                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                   Container(
                         height: 30.0,
                         width: 110.0,
                         child: Material(
@@ -507,6 +612,32 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         )
                       ),
+                       Container(
+                        height: 30.0,
+                        width: 110.0,
+                        child: Material(
+                          borderRadius: BorderRadius.circular(20.0),
+                          shadowColor: Colors.greenAccent,
+                          color: Colors.black12,
+                          elevation: 7.0,
+                          child: GestureDetector(
+                            onTap: () {
+                             editBio(context);
+                            },
+                            child: Center(
+                              child: Text(
+                                'Edit Bio and city',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Montserrat'),
+                              ),
+                            ),
+                          ),
+                        )
+                      ),
+                   
+                ],),
+                
               ],
             ))
       ],

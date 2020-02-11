@@ -31,18 +31,21 @@ class _DashboardPageState extends State<DashboardPage> {
   UserManagement usermanagement = new UserManagement();
 
   var displayname = "Tom";
-  var proffesionName = 'Proffesion';
+  var proffesionName = '...';
+  var bio = "...";
+  var city = '...';
   var profpic = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQL3964IjJHoLSLZ4iXOa9TPZcLzq7IKyFuzIXcaYlUwHg_61TV';
+  bool newtoggleValue = false;
   // var user = FirebaseAuth.instance.currentUser();
   // var newdisplayName;
   // var newprofpic;
-
+   
   @override initState() {
     super.initState();
     FirebaseAuth.instance.currentUser().then((user) async {
       setState(() {
           displayname = user.displayName;
-          
+       
       });
       initUserData();
     }).catchError((e){
@@ -65,9 +68,19 @@ class _DashboardPageState extends State<DashboardPage> {
     var snap =
         await Firestore.instance.collection('users').document(user.uid).get();
     var data = snap.data;
+    var snap1 = await Firestore.instance.collection('bio').document(user.uid).get();
+    var data1 = snap1.data;
+    var snap2 = await Firestore.instance.collection('city').document(user.uid).get();
+    var data2 = snap2.data;
+    var snap3 = await Firestore.instance.collection('available').document(user.uid).get();
+    var data3 = snap3.data; 
     setState(() {
       proffesionName = data['proffesion'];
+      bio = data1['bio'];
+      city = data2['city'];
+      newtoggleValue = data3['value'];
     });
+   
   }
   // File image;
   // Future getImage() async {
@@ -77,7 +90,7 @@ class _DashboardPageState extends State<DashboardPage> {
   //     image = picture;
   //   });
   // }
-  bool toggleValue = false;
+  // bool toggleValue = false;
   @override
   Widget build(BuildContext context) {
        return Scaffold(
@@ -125,7 +138,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       Padding(
                         padding: EdgeInsets.only(left: 20.0,right:20.0,top:20.0),
                         child: Text(
-                          " In 2016, she was named International Model of the Year by the British Fashion Council.",
+                           bio??"Lorem Ipsum bio of the user to be displayed....",
                           style: TextStyle(
                             fontFamily: "Montserrat",
                             fontWeight: FontWeight.w300,
@@ -142,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                    "San Franciso,USA",
+                                    city??"San Franciso,USA",
                                     style: TextStyle(
                                       fontFamily: "Montserrat",
                                       color: Colors.black87,
@@ -192,7 +205,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           width: 100.0,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20.0),
-                            color: toggleValue ? Colors.greenAccent[100]: Colors.redAccent[100].withOpacity(0.5)
+                            color: newtoggleValue ? Colors.greenAccent[100]: Colors.redAccent[100].withOpacity(0.5)
                           ),
                           child: Stack(
                             children: <Widget>[
@@ -200,10 +213,21 @@ class _DashboardPageState extends State<DashboardPage> {
                                 duration: Duration(milliseconds: 1000),
                                 curve: Curves.easeIn,
                                 top: 3.0,
-                                left: toggleValue ? 60.0 : 0.0,
-                                right: toggleValue ? 0.0 : 60.0,
+                                left: newtoggleValue ? 60.0 : 0.0,
+                                right: newtoggleValue ? 0.0 : 60.0,
                                 child: InkWell(
-                                  onTap: toggleButton,
+                                  onTap: () {
+                                    setState(() {
+                                      newtoggleValue = !newtoggleValue;
+                                      FirebaseAuth.instance.currentUser().then((user){
+                                        Firestore.instance.collection('available').document(user.uid).setData(
+                                          {"value": newtoggleValue,'user': user.displayName}
+                                        ).catchError((e){
+                                          print(e);
+                                        });
+                                      });
+                                    });
+                                  },
                                   child: AnimatedSwitcher(
                                     duration: Duration(milliseconds: 1000),
                                     transitionBuilder: (Widget child,Animation<double> animation){
@@ -212,7 +236,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         turns: animation
                                       );
                                     },
-                                    child: toggleValue ? Icon(Icons.check_circle,color: Colors.green,size: 35.0,
+                                    child: newtoggleValue ? Icon(Icons.check_circle,color: Colors.green,size: 35.0,
                                     key: UniqueKey()
                                     ) : Icon(Icons.remove_circle_outline,color: Colors.red,size: 35.0,
                                     key: UniqueKey()
@@ -230,19 +254,21 @@ class _DashboardPageState extends State<DashboardPage> {
             )
       );
   }
-  toggleButton() {
-    setState(() {
-      toggleValue = !toggleValue;
-    //   FirebaseAuth.instance.currentUser().then((user){
-    //   displayname = user.displayName;
-    //   profpic = user.photoUrl;
+  // toggleButton() {
+    
+  //   setState(() {
+  //     toggleValue = !toggleValue;
+      
+  //   //   FirebaseAuth.instance.currentUser().then((user){
+  //   //   displayname = user.displayName;
+  //   //   profpic = user.photoUrl;
 
-    //   print(displayname);
-    //   print(profpic);
-    // }).catchError((e){
-    //   print(e);
-    // });
-    //   print(displayname);
-    });
-  }
+  //   //   print(displayname);
+  //   //   print(profpic);
+  //   // }).catchError((e){
+  //   //   print(e);
+  //   // });
+  //   //   print(displayname);
+  //   });
+  // }
 }

@@ -15,8 +15,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     var firstColor = Color(0xff5b86e5), secondColor = Color(0xff36d1dc);
      return Scaffold(
+      
       resizeToAvoidBottomPadding: false,
-       body: Column(
+       body: 
+      Builder(
+        builder:  (BuildContext context){
+        return Center( 
+        child: Column(
          crossAxisAlignment: CrossAxisAlignment.start,
          children: <Widget>[
            Container(
@@ -28,7 +33,8 @@ class _LoginPageState extends State<LoginPage> {
                      "Hello",
                      style: TextStyle(
                        fontSize: 80.0,
-                       fontWeight: FontWeight.bold
+                       fontWeight: FontWeight.bold,
+                       color: Colors.black
                      )
                    )
                  ),
@@ -38,7 +44,8 @@ class _LoginPageState extends State<LoginPage> {
                      "There",
                      style: TextStyle(
                        fontSize: 80.0,
-                       fontWeight: FontWeight.bold
+                       fontWeight: FontWeight.bold,
+                       color: Colors.black,
                      )
                    )
                  ),
@@ -71,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                       hintText: "alexdaddrio001@gmail.com",
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.green
+                          color: Colors.blue
                         )
                       )
                     ),
@@ -92,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.green
+                          color: Colors.blue
                         )
                       )
                     ),
@@ -126,12 +133,22 @@ class _LoginPageState extends State<LoginPage> {
                   text: "LOGIN",
                   gradientColors: [secondColor, firstColor],
                   onPressed: () {
+                    if(_email==null){
+                        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Please enter the email...")));
+                      }
+                      if(_password==null){
+                        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Please enter the password...")));
+                      }
                     FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: _email,
                       password: _password
                     ).then((user){
                       Navigator.of(context).pushReplacementNamed('/homepage');
+                   
                     }).catchError((e){
+                      
+                      Scaffold.of(context)
+                      .showSnackBar(SnackBar(content: Text("Password/email is wrong..")));
                       print(e);
                     });
                   },
@@ -236,6 +253,9 @@ class _LoginPageState extends State<LoginPage> {
             // )
          ],
          )
+        );
+        }
+      )
     );
   }
 }
