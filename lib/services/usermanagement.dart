@@ -23,9 +23,9 @@ class UserManagement {
       // print(result.documentID);
      
     }
-Future updateProfilePic(picUrl) async {
+Future updateProfilePic(picpath) async {
       var userInfo = new UserUpdateInfo();
-      userInfo.photoUrl = picUrl;
+      userInfo.photoUrl = picpath;
       await FirebaseAuth.instance.currentUser().then((user) async {
          await user.updateProfile(userInfo);
          Firestore.instance.collection('/users')
@@ -33,7 +33,7 @@ Future updateProfilePic(picUrl) async {
          .getDocuments()
          .then((docs){
            Firestore.instance.document('/users/${docs.documents[0].documentID}')
-           .updateData({'photoUrl':picUrl}).then((val){
+           .updateData({'photoUrl':picpath}).then((val){
              print('Updated');
            }).catchError((e){
              print(e);
@@ -99,7 +99,11 @@ Future updateProfilePic(picUrl) async {
      return use;
   }
 
-
+  Future name() async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    String  username = user.displayName;
+    return username;
+  }
 
 
 

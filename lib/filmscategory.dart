@@ -134,10 +134,11 @@ class _NextfilmPageState extends State<NextfilmPage> {
                 //   Navigator.of(context).push('separProfPage');
                 // },
                   trailing: Icon(
-                        Icons.person_add,
+                        Icons.chat,
                          color: Colors.blue,
                         ),
                   onTap: () {
+                  Navigator.of(context).pushNamed('/chat');
                   //  FirebaseAuth.instance.currentUser().then((user){
                   //     Firestore.instance.collection('users').document(user.uid).collection('friends').add(
                   //       {

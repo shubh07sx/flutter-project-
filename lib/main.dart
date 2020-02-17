@@ -1,6 +1,7 @@
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:usingfirestore_app/categories.dart';
+import 'package:usingfirestore_app/chatpage.dart';
 import 'package:usingfirestore_app/fashioncategory.dart';
 import 'package:usingfirestore_app/filmscategory.dart';
 import 'package:usingfirestore_app/groups.dart';
@@ -9,6 +10,8 @@ import 'package:usingfirestore_app/selectprofpic.dart';
 import 'homepage.dart';
 import 'loginpage.dart';
 import 'loginsignup.dart';
+import 'chatpage.dart';
+import 'tempchat.dart';
 import 'signuppage.dart';
 import 'categories.dart';
 
@@ -40,7 +43,9 @@ class MyApp extends StatelessWidget {
               '/films': (BuildContext context) => new FilmPage(),
               '/fashion': (BuildContext context)=> new FashionPage(),
               '/music': (BuildContext context) => new MusicPage(),
-              '/groups': (BuildContext context) => new GroupsPage()
+              '/groups': (BuildContext context) => new GroupsPage(),
+              '/chat': (BuildContext context) => new ChatPage(),
+              '/tempchat': (BuildContext context) => new TempChat(),
            },
       );
   }
